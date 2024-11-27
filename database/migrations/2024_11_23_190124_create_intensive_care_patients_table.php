@@ -14,7 +14,9 @@ class CreateIntensiveCarePatientsTable extends Migration
     public function up()
     {
         Schema::create('intensive_care_patients', function (Blueprint $table) {
-            $table->string('id_card')->primary(); // رقم البطاقة كمفتاح أساسي
+
+            $table->id(); // رقم البطاقة كمفتاح أساسي
+            $table->unsignedBigInteger('id_card');
             $table->enum('patient_status', ['stable', 'critical', 'discharged'])->default('stable'); // حالة المريض
             $table->string('room_number'); // رقم الغرفة
             $table->string('bed_number'); // رقم التخت
@@ -22,6 +24,7 @@ class CreateIntensiveCarePatientsTable extends Migration
             $table->text('doctor_report')->nullable(); // تقرير الدكتور
             $table->date('discharge_date')->nullable(); // تاريخ الخروج
             $table->timestamps(); // الحقول الافتراضية created_at و updated_at
+            $table->foreign('id_card')->references('id_card')->on('patients')->onDelete('cascade');
         });
     }
 

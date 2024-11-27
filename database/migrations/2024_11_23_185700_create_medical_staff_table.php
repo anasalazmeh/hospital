@@ -14,7 +14,7 @@ class CreateMedicalStaffTable extends Migration
     public function up()
     {
         Schema::create('medical_staff', function (Blueprint $table) {
-            $table->string('id_card')->primary(); // رقم البطاقة كمفتاح أساسي
+            $table->string('id_card_medicalStaff.')->primary(); // رقم البطاقة كمفتاح أساسي
             $table->string('full_name'); // الاسم الكامل
             $table->enum('role', ['nurse', 'doctor', 'head_of_department'])->default('nurse'); // الصفة
             $table->string('department')->nullable(); // القسم (يمكن أن يكون فارغًا)
