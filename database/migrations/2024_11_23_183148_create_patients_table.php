@@ -12,12 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('patients', function (Blueprint $table) {
-            $table->string('id_card')->primary(); // رقم البطاقة (فريد)
-            $table->string('full_name'); // الاسم الكامل
+            $table->bigIncrements('id');
+            $table->string( 'id_card')->unique(); // رقم البطاقة (فريد)
+            $table->json('full_name'); // الاسم الكامل
+            $table->string('id_number'); //رقم الوطني
             $table->string('phone_number'); // الرقم
             $table->date('date_of_birth'); // المواليد
-            $table->longtext('medical_info')->nullable(); // معلومات طبية
+            $table->string('medical_info')->nullable(); // معلومات طبية
             $table->string('blood_type', 3)->nullable(); // زمرة الدم (مثل A+, B-)
+            $table->boolean("card_status")->default(true); // حالة البطاقة
             $table->timestamps(); // created_at و updated_at
         });
 

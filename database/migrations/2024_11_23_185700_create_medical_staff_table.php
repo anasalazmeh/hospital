@@ -13,15 +13,17 @@ class CreateMedicalStaffTable extends Migration
      */
     public function up()
     {
-        Schema::create('medical_staff', function (Blueprint $table) {
-            $table->string('id_card_medicalStaff.')->primary(); // رقم البطاقة كمفتاح أساسي
-            $table->string('full_name'); // الاسم الكامل
-            $table->enum('role', ['nurse', 'doctor', 'head_of_department'])->default('nurse'); // الصفة
-            $table->string('department')->nullable(); // القسم (يمكن أن يكون فارغًا)
-            $table->string('pin')->unique(); // رمز التعريف الشخصي (PIN)
-            $table->string('phone_number')->nullable(); // رقم الموبايل
-            $table->timestamps(); // الحقول الافتراضية created_at و updated_at
-        });
+        // Schema::create('medical_staff', function (Blueprint $table) {
+
+        //     $table->id('id')->primary(); // رقم
+        //     $table->string('id_card_medicalStaff'); // رقم البطافة
+        //     $table->string('full_name'); // الاسم الكامل
+        //     $table->enum('role', ['nurse', 'doctor', 'head_of_department'])->default('nurse'); // الصفة
+        //     $table->string('department')->nullable(); // القسم (يمكن أن يكون فارغًا)
+        //     $table->string('pin')->unique(); // رمز التعريف الشخصي (PIN)
+        //     $table->string('phone_number')->nullable(); // رقم الموبايل
+        //     $table->timestamps(); // الحقول الافتراضية created_at و updated_at
+        // });
     }
 
     /**

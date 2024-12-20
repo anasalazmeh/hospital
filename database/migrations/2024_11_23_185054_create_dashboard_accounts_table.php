@@ -13,15 +13,15 @@ class CreateDashboardAccountsTable extends Migration
      */
     public function up()
     {
-        Schema::create('dashboard_accounts', function (Blueprint $table) {
-            $table->id(); // المفتاح الأساسي
-            $table->string('full_name'); // الاسم الكامل
-            $table->string('email')->unique(); // البريد الإلكتروني (فريد)
-            $table->string('phone_number')->unique(); // رقم الموبايل
-            $table->string('password')->uniqid(); // كلمة السر
-            $table->enum('role', ['admin', 'card_creator', 'intensive_care'])->default('card_creator'); // الصلاحيات
-            $table->timestamps(); // الحقول الافتراضية created_at و updated_at
-        });
+        // Schema::create('dashboard_accounts', function (Blueprint $table) {
+        //     $table->id(); // المفتاح الأساسي
+        //     $table->string('full_name'); // الاسم الكامل
+        //     $table->string('email')->unique(); // البريد الإلكتروني (فريد)
+        //     $table->string('phone_number')->unique(); // رقم الموبايل
+        //     $table->string('password')->uniqid(); // كلمة السر
+        //     $table->enum('role', ['admin', 'card_creator', 'intensive_care'])->default('card_creator'); // الصلاحيات
+        //     $table->timestamps(); // الحقول الافتراضية created_at و updated_at
+        // });
     }
 
     /**

@@ -12,17 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('measurements_and_doses', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->primary(); // المستخدم المرتبط
-            $table->float('blood_pressure')->nullable(); // ضغط الدم
-            $table->float('blood_sugar')->nullable(); // نسبة السكر
-            $table->float('temperature')->nullable(); // الحرارة
-            $table->string('blood_analysis')->nullable(); // تحليل الدم
-            $table->float('urine_output')->nullable(); // نسبة التبول
-            $table->string('doses')->nullable(); // الجرعات
-            $table->float('oxygen_level')->nullable(); // معدل الأوكسجين
-            $table->timestamp('measurement_time'); // وقت القياس (تاريخ ووقت كامل بالدقة)
+            $table->bigIncrements('id'); // المستخدم المرتبط
+            $table->longText('blood_pressure')->nullable(); // ضغط الدم
+            $table->longText('blood_sugar')->nullable(); // نسبة السكر
+            $table->longText('temperature')->nullable(); // الحرارة
+            $table->longText('blood_analysis')->nullable(); // تحليل الدم
+            $table->longText('urine_output')->nullable(); // نسبة التبول
+            $table->longText('doses')->nullable(); // الجرعات
+            $table->longText('oxygen_level')->nullable(); // معدل الأوكسجين
             $table->timestamps(); // وقت الإنشاء والتحديث
-            $table->foreign('id')->references('id')->on('intensive_care_patients')->onDelete('cascade');
         });
 
     }
