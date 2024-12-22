@@ -33,3 +33,5 @@ Route::put('/patient/updateById_card', [PatientsController::class, 'updateById_c
 
 Route::post('/IntensiveCarePatients', [IntensiveCarePatients::class, 'store']);
 Route::get('/IntensiveCarePatients', [IntensiveCarePatients::class, 'get']);
+Route::put('/IntensiveCarePatients/{id}', [IntensiveCarePatients::class, 'update']);
+Route::put('/updateMeasurementAndDose/{id}', [IntensiveCarePatients::class, 'updateMeasurementAndDose']);
