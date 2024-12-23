@@ -14,7 +14,7 @@ class IntensiveCarePatients extends Controller
     {
         // التحقق من صحة البيانات المدخلة
         $validatedData = Validator::make($request->all(), [  // يقوم هذا السطر بالتحقق من صحة البيانات المدخلة من قبل المستخدم باستخدام قاعدة التحقق.
-            "id_card" => "required",  // تحقق أن "id_card" مطلوب وأنه فريد في جدول "patients".
+            "id_card" => "required|string",  // تحقق أن "id_card" مطلوب وأنه فريد في جدول "patients".
             "specialties" => "required|string",  // تحقق أن "specialties" مطلوب وأنه نص (string).
             "health_condition" => "required|string",  // تحقق أن "health_condition" مطلوب وأنه نص (string).
             "room_number" => "required|string",  // تحقق أن "room_number" مطلوب وأنه نص (string).
@@ -89,6 +89,56 @@ class IntensiveCarePatients extends Controller
             ], 500);
         }
     }
+    public function getById(Request $request,$id)
+    {
+        try {
+            $intensiveCarePatients = IntensiveCarePatient::with(['Patients', 'MeasurementAndDose'])->find($id);
+            if (!$intensiveCarePatients) {
+                return response()->json([
+                    'message' => 'intensive Care Patient not found'
+                ], 404);
+            }
+            return response()->json([
+                'message' => 'Intensive care patients retrieved successfully',
+                'data' => $intensiveCarePatients
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function getActive(Request $request)
+    {
+        try {
+            // استرجاع المرضى النشطين (الذين ليس لديهم تاريخ خروج)
+            $intensiveCarePatients = IntensiveCarePatient::with(['Patients', 'MeasurementAndDose'])
+                                                        ->whereNull('discharge_date')
+                                                        ->get();
+            // $intensiveCarePatients = IntensiveCarePatient::whereNull('discharge_date')->get();
+            // التحقق مما إذا كانت النتيجة فارغة
+            if ($intensiveCarePatients->isEmpty()) {
+                return response()->json([
+                    'message' => 'No active intensive care patients found'
+                ], 404);
+            }
+    
+            // إرجاع المرضى الذين لم يتم تفريغهم بنجاح
+            return response()->json([
+                'message' => 'Active intensive care patients retrieved successfully',
+                'data' => $intensiveCarePatients
+            ], 200);
+        } catch (\Exception $e) {
+            // إذا حدث استثناء في العملية
+            return response()->json([
+                'message' => 'An error occurred',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
     
 
 
@@ -163,8 +213,8 @@ class IntensiveCarePatients extends Controller
         // إذا كانت البيانات غير صالحة، أعد الاستجابة بخطأ
         if ($validator->fails()) {
             return response()->json([
-                'errors' => $validator->errors()
-            ], 422);  // 422 يعني أن البيانات غير صالحة
+                'errors' => $validator->errors(),
+            ], 422);
         }
     
         // البحث عن المريض باستخدام id
@@ -172,44 +222,130 @@ class IntensiveCarePatients extends Controller
     
         if (!$intensiveCarePatient) {
             return response()->json([
-                'message' => 'Patient not found'
+                'message' => 'Patient not found',
             ], 404);
         }
     
-  
-        // $measurementAndDose = MeasurementAndDose::find($intensiveCarePatient->id_measurements_and_surgeries);
-
-        // if (!$measurementAndDose) {
-        //     return response()->json([
-        //         'message' => 'Patient not found'
-        //     ], 404);
-        // }
+        // البحث عن بيانات القياسات والجرعات
+        $measurementAndDose = MeasurementAndDose::find($intensiveCarePatient->id_measurements_and_surgeries);
     
-        // // تحديث الحقول الخاصة بالقياسات والجرعات فقط
-        // $measurementAndDose->update($request->only([
-        //     'blood_pressure', 'blood_sugar', 'temperature', 'blood_analysis', 'urine_output',
-        //     'doses', 'oxygen_level'
-        // ]));
-        
-        // تحديث الحقول الخاصة بالقياسات والجرعات فقط
-        $measurementAndDose->update($request->only([
-            'blood_pressure', 'blood_sugar', 'temperature', 'blood_analysis', 'urine_output',
-            'doses', 'oxygen_level'
-        ]));
+        if (!$measurementAndDose) {
+            return response()->json([
+                'message' => 'Measurements and Doses not found',
+            ], 404);
+        }
     
-
+        // الحقول القابلة للتحديث
+        $fields = ['blood_pressure', 'blood_sugar', 'temperature', 'blood_analysis', 'urine_output', 'doses', 'oxygen_level'];
+    
+        $updatedData = []; // لتخزين القيم الجديدة المحدثة
+    
+        foreach ($fields as $field) {
+            if ($request->filled($field)) {
+                // استرجاع القيم القديمة
+                $existingData = $measurementAndDose->$field ?? '';
+    
+                // التحقق من أن القيم القديمة يمكن فك ترميزها
+                $decodedData = [];
+                if ($existingData && is_string($existingData)) {
+                    $decodedData = json_decode($existingData, true);
+    
+                    // إذا لم يكن JSON صالحًا، يتم تعيينه كمصفوفة فارغة
+                    if (json_last_error() !== JSON_ERROR_NONE || !is_array($decodedData)) {
+                        $decodedData = [];
+                    }
+                }
+    
+                // إذا كانت القيمة ليست JSON صالح، يتم تحويلها إلى مصفوفة فارغة
+                if (!is_array($decodedData)) {
+                    $decodedData = [];
+                }
+    
+                // إضافة القيمة الجديدة مع التاريخ والوقت
+                $decodedData[] = [
+                    'value' => $request->$field,
+                    'timestamp' => now()->toDateTimeString(),
+                ];
+    
+                // تحديث البيانات
+                $updatedData[$field] = json_encode($decodedData);
+            }
+        }
+    
+        // تحديث القيم في جدول القياسات والجرعات
+        if (!empty($updatedData)) {
+            $measurementAndDose->update($updatedData);
+        }
     
         // إرجاع الاستجابة بنجاح
         return response()->json([
-            'message' => 'Patient measurements and doses updated successfully',
-            'patient' => $measurementAndDose
+            'message' => 'Measurements and doses updated successfully',
+            'data' => $measurementAndDose,
         ], 200);
     }
     
-    
- 
-}
+    public function updateDischargeDate(Request $request, $id)
 
+    {
+   
+        // البحث عن المريض باستخدام id
+        $intensiveCarePatient = IntensiveCarePatient::find($id);
+
+        if (!$intensiveCarePatient) {
+            return response()->json([
+                'message' => 'Patient not found'
+            ], 404);
+        }
+
+        // تحديث بيانات المريض
+        $intensiveCarePatient->update(["discharge_date" => now()->toDateTimeString() ]);
+
+        // إرجاع الاستجابة بنجاح
+        return response()->json([
+            'message' => 'Intensive Care Patient updated discharge date successfully',
+            'patient' => $intensiveCarePatient
+        ], 200);
+    } 
+    public function updateDoctorReport(Request $request, $id)
+    {
+   
+        // البحث عن المريض باستخدام id
+        $intensiveCarePatient = IntensiveCarePatient::find($id);
+
+        if (!$intensiveCarePatient) {
+            return response()->json([
+                'message' => 'Intensive Care Patient not found'
+            ], 404);
+        }
+
+            // استرجاع القيم القديمة
+    $existingDoctorReport = $intensiveCarePatient->doctor_report ?? ''; // الحقل الخاص بالقياسات
+
+    // إضافة القيمة الجديدة مع التاريخ والوقت
+    $newDoctorReport = [
+        'value' => $request->doctor_report,
+        'timestamp' => now()->toDateTimeString(),
+    ];
+
+    // تحويل القيم إلى نص JSON وتحديث الحقل
+    $updatedDoctorReport = $existingDoctorReport
+        ? json_decode($existingDoctorReport, true) 
+        : [];
+
+    $updatedDoctorReport[] = $newDoctorReport;
+
+    $intensiveCarePatient->update([
+        'doctor_report' => json_encode($updatedDoctorReport),
+    ]);
+
+    return response()->json([
+        'message' => 'Measurement added successfully',
+        'intensiveCarePatient' => $intensiveCarePatient,
+    ], 200);
+
+    } 
+
+}
     
 
 

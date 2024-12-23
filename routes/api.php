@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PatientsController;
 
 use App\Http\Controllers\Api\IntensiveCarePatients;
-
+use App\Http\Controllers\Api\DashboardAccountsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,6 +32,18 @@ Route::put('/patient/updateById_card', [PatientsController::class, 'updateById_c
 
 
 Route::post('/IntensiveCarePatients', [IntensiveCarePatients::class, 'store']);
+
 Route::get('/IntensiveCarePatients', [IntensiveCarePatients::class, 'get']);
+Route::get('/IntensiveCarePatients/{id}', [IntensiveCarePatients::class, 'getById']);
+Route::get('/IntensiveCarePatientsActive', [IntensiveCarePatients::class, 'getActive']);
+
 Route::put('/IntensiveCarePatients/{id}', [IntensiveCarePatients::class, 'update']);
 Route::put('/updateMeasurementAndDose/{id}', [IntensiveCarePatients::class, 'updateMeasurementAndDose']);
+Route::put('/updateDischargeDate/{id}', [IntensiveCarePatients::class, 'updateDischargeDate']);
+Route::put('/updateDoctorReport/{id}', [IntensiveCarePatients::class, 'updateDoctorReport']);
+
+
+Route::get('/dashboardAccounts', [DashboardAccountsController::class, 'index']); // عرض جميع الحسابات
+Route::post('/dashboardAccounts', [DashboardAccountsController::class, 'store']);
+Route::post('/login', [DashboardAccountsController::class, 'login']);  // تسجيل الدخول
+Route::delete('/dashboardAccounts/{id}', [DashboardAccountsController::class, 'delete']);
