@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Schema::create('specialties', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('name'); // اسم التخصص بالعربية
-        //     $table->text('description')->nullable(); // وصف التخصص
-        //     $table->timestamps();
-        // });
+        Schema::create('specialties', function (Blueprint $table) {
+            $table->id();
+            $table->string('name'); // اسم التخصص بالعربية
+            $table->text('description')->nullable(); // وصف التخصص
+            $table->timestamps();
+        });
     }
 
     /**

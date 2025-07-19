@@ -3,7 +3,8 @@
 namespace App\Providers;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-
+use App\Models\Bed;
+use App\Observers\BedObserver;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -20,6 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        
+        Bed::observe(BedObserver::class);
     }
 }

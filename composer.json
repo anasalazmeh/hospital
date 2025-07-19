@@ -7,11 +7,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "intervention/image": "^3.11",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
+        "nesbot/carbon": "^3.9",
         "psy/psysh": "^0.12.7",
-        "tymon/jwt-auth": "^2.1"
+        "symfony/mailer": "^7.0",
+        "tymon/jwt-auth": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
